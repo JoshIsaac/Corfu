@@ -1331,6 +1331,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
       <div class="modal-field"><label>Longitude</label><input id="pin-lng" type="number" step="0.0001" placeholder="19.9217"></div>
     </div>
     <div class="modal-field"><label>Notes</label><textarea id="pin-note" placeholder="What&#39;s here? Any tips?"></textarea></div>
+    <div class="modal-field"><label>Linked note (optional)</label>
+      <select id="pin-note-link"><option value="">— No linked note —</option></select>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="closePinModal()">Cancel</button>
       <button class="btn btn-primary" onclick="savePinModal()">Save pin</button>
@@ -1998,7 +2001,8 @@ function renderMapMarkers(){
     const style=CAT_STYLE[loc.cat]||{color:'#666',bg:'#eee',icon:'📍'};
     const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 10.5 14 24 16 24s16-13.5 16-24C32 7.16 24.84 0 16 0z" fill="${style.color}"/><circle cx="16" cy="16" r="10" fill="white" opacity="0.9"/><text x="16" y="21" text-anchor="middle" font-size="12">${style.icon}</text></svg>`;
     const icon=L.divIcon({html:svg,className:'',iconSize:[32,40],iconAnchor:[16,40],popupAnchor:[0,-42]});
-    const popup=`<div class="popup-title">${loc.name}</div><span class="popup-cat" style="background:${style.bg};color:${style.color}">${style.icon} ${loc.cat}</span><div class="popup-note">${loc.note||''}</div><div class="popup-actions"><button class="popup-btn" onclick="editPin(${idx})">✏ Edit</button><button class="popup-btn popup-btn-danger" onclick="deletePin(${idx})">✕ Remove</button></div>`;
+    const noteBtnHtml=loc.noteLink?`<button class="popup-btn" onclick="openNoteFromPin('${loc.noteLink}')">📝 Note</button>`:'';
+    const popup=`<div class="popup-title">${loc.name}</div><span class="popup-cat" style="background:${style.bg};color:${style.color}">${style.icon} ${loc.cat}</span><div class="popup-note">${loc.note||''}</div><div class="popup-actions"><button class="popup-btn" onclick="editPin(${idx})">✏ Edit</button>${noteBtnHtml}<button class="popup-btn popup-btn-danger" onclick="deletePin(${idx})">✕ Remove</button></div>`;
     const m=L.marker([loc.lat,loc.lng],{icon}).addTo(leafletMap).bindPopup(popup);
     markers.push(m);
   });
@@ -2027,6 +2031,14 @@ function openPinModal(idx){
     pickingCoords=true;
     if(leafletMap)document.getElementById('map').style.cursor='crosshair';
   }
+  const noteSelect=document.getElementById('pin-note-link');
+  noteSelect.innerHTML='<option value="">— No linked note —</option>';
+  (appState.notes||[]).forEach(n=>{
+    const opt=document.createElement('option');
+    opt.value=n.id;opt.textContent=n.title||'Untitled';
+    noteSelect.appendChild(opt);
+  });
+  if(editingPinIdx!==null){noteSelect.value=appState.pins[editingPinIdx].noteLink||'';}
   modal.style.display='flex';
 }
 function editPin(idx){if(leafletMap)leafletMap.closePopup();openPinModal(idx);}
@@ -2040,8 +2052,9 @@ function savePinModal(){
   if(!name){flash('Please enter a name');return;}
   if(isNaN(lat)||isNaN(lng)){flash('Please set coordinates — click on the map or enter them manually');return;}
   if(!appState.pins)appState.pins=[];
-  if(editingPinIdx!==null){appState.pins[editingPinIdx]={name,cat,lat,lng,note};}
-  else{appState.pins.push({name,cat,lat,lng,note});}
+  const noteLink=document.getElementById('pin-note-link').value||'';
+  if(editingPinIdx!==null){appState.pins[editingPinIdx]={name,cat,lat,lng,note,noteLink};}
+  else{appState.pins.push({name,cat,lat,lng,note,noteLink});}
   closePinModal();scheduleSave();renderMapMarkers();renderMapLegend();flash(editingPinIdx!==null?'Pin updated ✓':'Pin added ✓');
 }
 function deletePin(idx){
@@ -2380,6 +2393,12 @@ function renderNotesList(){
     div.onclick=()=>openNote(note.id);
     c.appendChild(div);
   });
+}
+function openNoteFromPin(noteId){
+  if(leafletMap)leafletMap.closePopup();
+  const navEl=document.querySelector('.nav-item[onclick*=notes]');
+  showPanel('notes',navEl);
+  setTimeout(()=>openNote(noteId),50);
 }
 
 /* ══ UTILS ══ */
