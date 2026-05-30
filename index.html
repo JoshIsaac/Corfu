@@ -402,7 +402,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
   <nav class="sidebar">
     <div class="nav-section">Overview</div>
     <a class="nav-item" onclick="showPanel(&#39;dashboard&#39;,this)"><span class="nav-icon">🌤</span> Dashboard</a>
-    <a class="nav-item" onclick="showPanel(&#39;calendar&#39;,this)"><span class="nav-icon">🗓</span> Calendar</a>
+    <a class="nav-item" onclick="showPanel(&#39;map&#39;,this)"><span class="nav-icon">🗺</span> Map</a>
     <div class="nav-section">Plan</div>
     <a class="nav-item active" onclick="showPanel(&#39;itinerary&#39;,this)"><span class="nav-icon">📅</span> Itinerary</a>
     <a class="nav-item" onclick="showPanel(&#39;wishlist&#39;,this)"><span class="nav-icon">⭐</span> Wishlist</a>
@@ -422,39 +422,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
       <p>Open <code>index.html</code> and replace <code>YOUR_SUPABASE_URL</code> and <code>YOUR_SUPABASE_ANON_KEY</code> near the bottom of the file.</p>
     </div>
 
-    <!-- DASHBOARD -->
+      <!-- DASHBOARD -->
     <div id="panel-dashboard" class="panel">
       <div class="page-title">Dashboard</div>
-      <p class="page-subtitle">Live weather forecast + interactive map of all locations</p>
+      <p class="page-subtitle">Live weather forecast + calendar</p>
       <div class="card-title" style="margin-bottom:.5rem">🌤 Weather — Corfu, August</div>
       <div id="wx-container"><div style="text-align:center;padding:2rem;color:var(--ink3)">Loading forecast…</div></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin:1.25rem 0 .5rem">
-        <div class="card-title" style="margin:0">🗺 Locations map</div>
-        <button class="btn btn-primary btn-sm" onclick="openPinModal()">+ Add pin</button>
+      <div style="margin-top:1.5rem">
+        <div class="page-title" style="font-size:1.3rem;margin-bottom:.25rem">Calendar</div>
+        <p class="page-subtitle">All itinerary events · synced live with your itinerary</p>
+        <div class="cal-legend" id="cal-legend"></div>
+        <div class="card" style="padding:1.25rem">
+          <div class="cal-nav">
+            <div class="cal-nav-btns">
+              <button class="btn btn-sm" onclick="calPrev()">‹</button>
+              <button class="btn btn-sm" onclick="calToday()">Today</button>
+              <button class="btn btn-sm" onclick="calNext()">›</button>
+            </div>
+            <div class="cal-nav-title" id="cal-month-label"></div>
+            <button class="btn btn-sm btn-primary" onclick="showPanel(&#39;itinerary&#39;,document.querySelector(&#39;.nav-item[onclick*=itinerary]&#39;))">Edit itinerary →</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div id="cal-day-detail" style="display:none"></div>
       </div>
-      <div class="map-legend" id="map-legend"></div>
-      <div id="map"></div>
-      <p style="font-size:.75rem;color:var(--ink3);margin-top:4px">Click any pin to view details or edit. Use legend to filter categories.</p>
     </div>
 
-    <!-- CALENDAR -->
-    <div id="panel-calendar" class="panel">
-      <div class="page-title">Calendar</div>
-      <p class="page-subtitle">All itinerary events in a monthly view · synced live with your itinerary</p>
-      <div class="cal-legend" id="cal-legend"></div>
-      <div class="card" style="padding:1.25rem">
-        <div class="cal-nav">
-          <div class="cal-nav-btns">
-            <button class="btn btn-sm" onclick="calPrev()">‹</button>
-            <button class="btn btn-sm" onclick="calToday()">Today</button>
-            <button class="btn btn-sm" onclick="calNext()">›</button>
-          </div>
-          <div class="cal-nav-title" id="cal-month-label"></div>
-          <button class="btn btn-sm btn-primary" onclick="showPanel(&#39;itinerary&#39;,document.querySelector(&#39;.nav-item[onclick*=itinerary]&#39;))">Edit itinerary →</button>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
+    <!-- MAP -->
+    <div id="panel-map" class="panel">
+      <div class="page-title">Map</div>
+      <p class="page-subtitle">All locations · click any pin to view or edit · use legend to filter</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <div class="map-legend" id="map-legend" style="margin:0;flex:1"></div>
+        <button class="btn btn-primary btn-sm" style="flex-shrink:0;margin-left:8px" onclick="openPinModal()">+ Add pin</button>
       </div>
-      <div id="cal-day-detail" style="display:none"></div>
+      <div id="map"></div>
+      <p style="font-size:.75rem;color:var(--ink3);margin-top:4px">Click any pin to view details or edit.</p>
     </div>
 
     <!-- ITINERARY -->
@@ -1570,8 +1573,8 @@ function showPanel(id,el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   if(el)el.classList.add('active');
-  if(id==='dashboard'){if(!wxData)fetchWeather();setTimeout(()=>{if(!leafletMap)initMap();else leafletMap.invalidateSize();},100);}
-  if(id==='calendar'){calYear=TRIP_YEAR;calMonth=7;renderCalendar();}
+  if(id==='dashboard'){if(!wxData)fetchWeather();calYear=TRIP_YEAR;calMonth=7;renderCalendar();}
+  if(id==='map'){setTimeout(()=>{if(!leafletMap)initMap();else leafletMap.invalidateSize();},100);}
 }
 function setUser(u){currentUser=u;renderWishlist();renderPacking();}
 function setConn(type,text){const el=document.getElementById('conn-badge');el.className='conn-badge conn-'+type;el.innerHTML=`<div class="conn-dot"></div><span>${text}</span>`;}
