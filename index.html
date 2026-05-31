@@ -312,6 +312,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
 .setup-banner p{font-size:.82rem;color:var(--ink2);line-height:1.55}
 .setup-banner code{background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:.8rem;font-family:monospace}
 
+/* ── TASKS ── */
+.task-filter{font-size:.75rem!important}
+.task-filter.active{background:var(--sea)!important;color:var(--white)!important;border-color:var(--sea)!important}
+.task-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .12s}
+.task-card:hover{background:var(--sand)}
+.task-card.dragging{opacity:.4}
+.task-card.drag-over-card{outline:2px dashed var(--sea2);outline-offset:2px}
+.task-col{background:var(--sand);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px;flex:1;min-width:0}
+.task-col.drop-active{background:var(--sea-lt);border-color:var(--sea2)}
+.task-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.task-col-title{font-size:.78rem;font-weight:500;color:var(--ink2)}
+.task-col-count{font-size:.72rem;background:var(--white);border:1px solid var(--border);border-radius:20px;padding:1px 7px;color:var(--ink3)}
+.task-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.task-row:last-child{border-bottom:none}
+.task-row:hover{background:var(--sand)}
+.task-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--ink3);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s}
+.task-check.checked{background:var(--teal);border-color:var(--teal)}
+.task-check.inprog{background:var(--sea);border-color:var(--sea)}
+.task-name{flex:1;font-size:.875rem;cursor:pointer}
+.task-name.done{text-decoration:line-through;color:var(--ink3)}
+.task-tag{font-size:.68rem;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+.task-tag-high{background:var(--coral-lt);color:var(--coral)}
+.task-tag-med{background:var(--amber-lt);color:var(--amber)}
+.task-tag-low{background:var(--sand2);color:var(--ink2)}
+.task-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:500;flex-shrink:0}
+.task-av-p1{background:var(--sea-lt);color:var(--sea)}
+.task-av-p2{background:var(--teal-lt);color:var(--teal)}
+.task-av-both{background:var(--sand2);color:var(--ink2)}
+.task-due{font-size:.72rem;color:var(--ink3);white-space:nowrap}
+.task-section-hdr{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);padding:8px 10px 4px;border-bottom:1px solid var(--border)}
+.task-add-col{width:100%;background:transparent;border:1px dashed var(--border);border-radius:var(--radius);padding:6px;font-size:.75rem;color:var(--ink3);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:4px}
+.task-add-col:hover{background:rgba(255,255,255,.6)}
+.task-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.task-modal{background:var(--white);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+
 /* ── NOTES ── */
 .notes-layout{display:grid;grid-template-columns:260px 1fr;gap:0;height:calc(100vh - 160px);min-height:500px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
 .notes-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--sand);overflow:hidden}
@@ -451,7 +486,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
     <div class="nav-section">Plan</div>
     <a class="nav-item active" onclick="showPanel(&#39;itinerary&#39;,this)"><span class="nav-icon">📅</span> Itinerary</a>
     <a class="nav-item" onclick="showPanel(&#39;wishlist&#39;,this)"><span class="nav-icon">⭐</span> Wishlist</a>
-    <a class="nav-item" onclick="showPanel(&#39;notes&#39;,this)"><span class="nav-icon">📝</span> Notes</a>
+    <a class="nav-item" onclick="showPanel(&#39;notes&#39;,this)"><span class="nav-icon">📝</span> Notes</a>     <a class="nav-item" onclick="showPanel(&#39;tasks&#39;,this)"><span class="nav-icon">✅</span> Tasks</a>
     <div class="nav-section">Finance</div>
     <a class="nav-item" onclick="showPanel(&#39;budget&#39;,this)"><span class="nav-icon">💷</span> Budget</a>
     <div class="nav-section">Prep</div>
@@ -948,6 +983,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--ink);mi
       </div>
     </div>
     
+    <!-- TASKS -->
+    <div id="panel-tasks" class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div>
+          <div class="page-title">Tasks</div>
+          <p class="page-subtitle" style="margin:0">Pre-trip to-dos · drag between columns · synced with your partner</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ New task</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="display:flex;background:var(--sand);border:1px solid var(--border);border-radius:8px;padding:2px;gap:2px">
+          <button id="task-tog-list" class="btn btn-sm" style="border:none;background:var(--white);font-size:.78rem" onclick="switchTaskView('list')">☰ List</button>
+          <button id="task-tog-board" class="btn btn-sm" style="border:none;background:transparent;font-size:.78rem" onclick="switchTaskView('board')">⊞ Board</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="task-progress-label" style="font-size:.78rem;color:var(--ink3)">0 / 0 done</span>
+          <div style="width:120px;height:5px;background:var(--sand2);border-radius:3px;overflow:hidden"><div id="task-progress-bar" style="height:5px;background:var(--teal);border-radius:3px;width:0%;transition:width .3s"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+        <button class="btn btn-sm task-filter active" data-filter="all" onclick="setTaskFilter('all',this)">All</button>
+        <button class="btn btn-sm task-filter" data-filter="p1" onclick="setTaskFilter('p1',this)">Joshua</button>
+        <button class="btn btn-sm task-filter" data-filter="p2" onclick="setTaskFilter('p2',this)">Allie</button>
+        <button class="btn btn-sm task-filter" data-filter="high" onclick="setTaskFilter('high',this)">High priority</button>
+      </div>
+      <div id="task-view-list"></div>
+      <div id="task-view-board" style="display:none"></div>
+    </div>
+
     <!-- BUDGET -->
     <div id="panel-budget" class="panel">
       <div class="page-title">Budget</div>
@@ -1642,7 +1706,7 @@ function saveLocal(){try{localStorage.setItem('corfu2026',JSON.stringify(appStat
 function loadLocal(){try{const r=localStorage.getItem('corfu2026');appState=r?JSON.parse(r):defaultState();}catch(e){appState=defaultState();}}
 function defaultState(){
   const pack={};Object.entries(DEFAULT_PACK).forEach(([cat,items])=>{pack[cat]=items.map(t=>({text:t,checked:false,who:'both'}));});
-  return{days:DEFAULT_DAYS.map(d=>({...d,events:d.events.map(e=>({...e}))})),wishes:DEFAULT_WISHES.map(w=>({...w})),expenses:[],budget:0,pack,pins:DEFAULT_PINS.map(p=>({...p})),notes:[]};
+  return{days:DEFAULT_DAYS.map(d=>({...d,events:d.events.map(e=>({...e}))})),wishes:DEFAULT_WISHES.map(w=>({...w})),expenses:[],budget:0,pack,pins:DEFAULT_PINS.map(p=>({...p})),notes:[],tasks:[]};
 }
 
 /* ══ UI ══ */
@@ -2402,6 +2466,247 @@ function openNoteFromPin(noteId){
   const navEl=document.querySelector('.nav-item[onclick*=notes]');
   showPanel('notes',navEl);
   setTimeout(()=>openNote(noteId),50);
+}
+
+/* ══ TASKS ══ */
+let taskView='list',taskFilter='all',editingTaskId=null,dragTaskId=null;
+const TASK_STATUSES=['todo','inprogress','done'];
+const STATUS_LABEL={'todo':'To do','inprogress':'In progress','done':'Done'};
+
+function defaultTasks(){return[];}
+
+function openTaskModal(id){
+  editingTaskId=id||null;
+  const task=id?(appState.tasks||[]).find(t=>t.id===id):null;
+  const existing=document.getElementById('task-modal-overlay');
+  if(existing)existing.remove();
+  const overlay=document.createElement('div');
+  overlay.id='task-modal-overlay';overlay.className='task-modal-overlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+  overlay.innerHTML=`<div class="task-modal">
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem">${task?'Edit task':'New task'}</h3>
+    <div class="modal-field"><label>Task name</label><input id="tm-name" type="text" placeholder="What needs to be done?" value="${esc(task?.name||'')}"></div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Assigned to</label>
+        <select id="tm-who">
+          <option value="p1"${(!task||task.who==='p1')?' selected':''}>Joshua</option>
+          <option value="p2"${task?.who==='p2'?' selected':''}>Allie</option>
+          <option value="both"${task?.who==='both'?' selected':''}>Both</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Priority</label>
+        <select id="tm-pri">
+          <option value="high"${(!task||task.pri==='high')?' selected':''}>High</option>
+          <option value="med"${task?.pri==='med'?' selected':''}>Medium</option>
+          <option value="low"${task?.pri==='low'?' selected':''}>Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Category</label>
+        <select id="tm-cat">
+          ${['General','Diving','Sailing','Kitesurfing','Hiking','History','Food','Accommodation','Documents','Health','Exploring'].map(c=>`<option value="${c}"${task?.cat===c?' selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-field"><label>Due date</label><input id="tm-due" type="date" value="${task?.due||''}"></div>
+    </div>
+    <div class="modal-field"><label>Status</label>
+      <select id="tm-status">
+        <option value="todo"${(!task||task.status==='todo')?' selected':''}>To do</option>
+        <option value="inprogress"${task?.status==='inprogress'?' selected':''}>In progress</option>
+        <option value="done"${task?.status==='done'?' selected':''}>Done</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Notes</label><textarea id="tm-notes" placeholder="Any details…" style="min-height:60px">${esc(task?.notes||'')}</textarea></div>
+    <div class="modal-actions">
+      ${task?`<button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Delete</button>`:''}
+      <button class="btn" onclick="document.getElementById('task-modal-overlay').remove()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save task</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>document.getElementById('tm-name')?.focus(),50);
+}
+
+function saveTask(){
+  const name=document.getElementById('tm-name').value.trim();
+  if(!name){alert('Please enter a task name');return;}
+  if(!appState.tasks)appState.tasks=[];
+  const id=editingTaskId||('task-'+Date.now());
+  const task={
+    id,name,
+    who:document.getElementById('tm-who').value,
+    pri:document.getElementById('tm-pri').value,
+    cat:document.getElementById('tm-cat').value,
+    due:document.getElementById('tm-due').value,
+    status:document.getElementById('tm-status').value,
+    notes:document.getElementById('tm-notes').value.trim(),
+    created:editingTaskId?(appState.tasks.find(t=>t.id===editingTaskId)?.created||new Date().toISOString()):new Date().toISOString()
+  };
+  if(editingTaskId){
+    const idx=appState.tasks.findIndex(t=>t.id===editingTaskId);
+    if(idx>-1)appState.tasks[idx]=task;
+  }else{
+    appState.tasks.push(task);
+  }
+  document.getElementById('task-modal-overlay').remove();
+  scheduleSave();renderTasks();
+}
+
+function deleteTask(id){
+  if(!confirm('Delete this task?'))return;
+  appState.tasks=(appState.tasks||[]).filter(t=>t.id!==id);
+  document.getElementById('task-modal-overlay')?.remove();
+  scheduleSave();renderTasks();
+}
+
+function setTaskStatus(id,status){
+  const task=(appState.tasks||[]).find(t=>t.id===id);
+  if(!task)return;
+  task.status=status;
+  scheduleSave();renderTasks();
+}
+
+function switchTaskView(v){
+  taskView=v;
+  document.getElementById('task-view-list').style.display=v==='list'?'block':'none';
+  document.getElementById('task-view-board').style.display=v==='board'?'flex':'none';
+  document.getElementById('task-tog-list').style.background=v==='list'?'var(--white)':'transparent';
+  document.getElementById('task-tog-board').style.background=v==='board'?'var(--white)':'transparent';
+  renderTasks();
+}
+
+function setTaskFilter(f,btn){
+  taskFilter=f;
+  document.querySelectorAll('.task-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function filterTasks(tasks){
+  return tasks.filter(t=>{
+    if(taskFilter==='p1')return t.who==='p1';
+    if(taskFilter==='p2')return t.who==='p2';
+    if(taskFilter==='high')return t.pri==='high';
+    return true;
+  });
+}
+
+function taskAvatarHtml(who){
+  const cls=who==='p1'?'task-av-p1':who==='p2'?'task-av-p2':'task-av-both';
+  const lbl=who==='p1'?'J':who==='p2'?'A':'B';
+  return `<span class="task-av ${cls}" title="${who==='p1'?'Joshua':who==='p2'?'Allie':'Both'}">${lbl}</span>`;
+}
+
+function taskPriHtml(pri){
+  const cls=pri==='high'?'task-tag-high':pri==='med'?'task-tag-med':'task-tag-low';
+  const lbl=pri==='high'?'High':pri==='med'?'Medium':'Low';
+  return `<span class="task-tag ${cls}">${lbl}</span>`;
+}
+
+function renderTasks(){
+  if(!appState.tasks)appState.tasks=[];
+  const all=appState.tasks;
+  const done=all.filter(t=>t.status==='done').length;
+  const total=all.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('task-progress-bar').style.width=pct+'%';
+  document.getElementById('task-progress-label').textContent=`${done} / ${total} done`;
+  if(taskView==='list')renderTaskList();
+  else renderTaskBoard();
+}
+
+function renderTaskList(){
+  const c=document.getElementById('task-view-list');
+  const filtered=filterTasks(appState.tasks||[]);
+  const sections=[
+    {key:'todo',tasks:filtered.filter(t=>t.status==='todo')},
+    {key:'inprogress',tasks:filtered.filter(t=>t.status==='inprogress')},
+    {key:'done',tasks:filtered.filter(t=>t.status==='done')}
+  ];
+  c.innerHTML='';
+  sections.forEach(({key,tasks})=>{
+    if(!tasks.length&&key==='done')return;
+    const wrap=document.createElement('div');
+    wrap.style.cssText='background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:10px';
+    const hdr=document.createElement('div');hdr.className='task-section-hdr';
+    hdr.textContent=STATUS_LABEL[key]+` (${tasks.length})`;
+    wrap.appendChild(hdr);
+    if(!tasks.length){
+      const empty=document.createElement('div');
+      empty.style.cssText='padding:10px 12px;font-size:.82rem;color:var(--ink3)';
+      empty.textContent='Nothing here yet.';
+      wrap.appendChild(empty);
+    }
+    tasks.forEach(task=>{
+      const row=document.createElement('div');row.className='task-row';
+      const isDone=task.status==='done';
+      const isInProg=task.status==='inprogress';
+      const checkCls=isDone?'checked':isInProg?'inprog':'';
+      const checkMark=isDone||isInProg?'✓':'';
+      row.innerHTML=`
+        <div class="task-check ${checkCls}" onclick="cycleTaskStatus('${task.id}')" title="Click to change status">${checkMark}</div>
+        <span class="task-name${isDone?' done':''}" onclick="openTaskModal('${task.id}')">${esc(task.name)}</span>
+        ${task.cat?`<span class="task-tag" style="background:var(--sand2);color:var(--ink2)">${task.cat}</span>`:''}
+        ${taskPriHtml(task.pri)}
+        ${taskAvatarHtml(task.who)}
+        ${task.due?`<span class="task-due">📅 ${task.due}</span>`:''}`;
+      wrap.appendChild(row);
+    });
+    c.appendChild(wrap);
+  });
+  if(!filtered.length){
+    c.innerHTML='<div class="empty">No tasks yet — click + New task to add one.</div>';
+  }
+}
+
+function cycleTaskStatus(id){
+  const task=(appState.tasks||[]).find(t=>t.id===id);
+  if(!task)return;
+  const order=['todo','inprogress','done'];
+  const next=order[(order.indexOf(task.status)+1)%order.length];
+  task.status=next;
+  scheduleSave();renderTasks();
+}
+
+function renderTaskBoard(){
+  const c=document.getElementById('task-view-board');
+  c.style.cssText='display:flex;gap:10px;align-items:flex-start';
+  c.innerHTML='';
+  const filtered=filterTasks(appState.tasks||[]);
+  TASK_STATUSES.forEach(status=>{
+    const tasks=filtered.filter(t=>t.status===status);
+    const col=document.createElement('div');
+    col.className='task-col';col.dataset.status=status;
+    col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('drop-active');});
+    col.addEventListener('dragleave',()=>col.classList.remove('drop-active'));
+    col.addEventListener('drop',e=>{
+      e.preventDefault();col.classList.remove('drop-active');
+      if(dragTaskId){setTaskStatus(dragTaskId,status);dragTaskId=null;}
+    });
+    col.innerHTML=`<div class="task-col-header"><span class="task-col-title">${STATUS_LABEL[status]}</span><span class="task-col-count">${tasks.length}</span></div>`;
+    tasks.forEach(task=>{
+      const card=document.createElement('div');card.className='task-card';
+      card.draggable=true;
+      card.addEventListener('dragstart',e=>{dragTaskId=task.id;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+      card.addEventListener('dragend',()=>card.classList.remove('dragging'));
+      card.innerHTML=`
+        <div style="font-size:.84rem;font-weight:500;color:var(--ink);margin-bottom:6px;line-height:1.4">${esc(task.name)}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+          ${task.cat?`<span class="task-tag" style="background:var(--sand2);color:var(--ink2)">${task.cat}</span>`:''}
+          ${taskPriHtml(task.pri)}
+          ${taskAvatarHtml(task.who)}
+          ${task.due?`<span class="task-due" style="margin-left:auto">📅 ${task.due}</span>`:''}
+        </div>`;
+      card.onclick=()=>openTaskModal(task.id);
+      col.appendChild(card);
+    });
+    const addBtn=document.createElement('button');addBtn.className='task-add-col';
+    addBtn.innerHTML='+ Add task';
+    addBtn.onclick=()=>{openTaskModal();setTimeout(()=>{const s=document.getElementById('tm-status');if(s)s.value=status;},60);};
+    col.appendChild(addBtn);
+    c.appendChild(col);
+  });
 }
 
 /* ══ UTILS ══ */
